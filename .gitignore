@@ -1,0 +1,7 @@
+pkg
+rdoc
+Makefile
+Gemfile.lock
+
+*.bundle
+*.log
