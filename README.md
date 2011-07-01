@@ -1,0 +1,4 @@
+MGFramework
+===========
+
+See examples/ directory.
