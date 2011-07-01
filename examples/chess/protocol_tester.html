@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Protocol Tester</title>
+		<script language="javascript" src="http://code.jquery.com/jquery-1.6.1.min.js"></script>
+        <script language="javascript">
+			function printObject(o) {
+			  var out = '';
+			  for (var p in o) {
+				out += p + ': ' + o[p] + ';\n';
+			  }
+			  return out;
+			}
+			$(document).ready(function(){
+				var webSocket = new WebSocket('ws://localhost:26708/');
+	 
+				webSocket.onopen = function(event) {
+					//alert('onopen');
+					$('#log').prepend('<div class="packet opened"><h3>Connection opened</h3></div>');
+					//webSocket.send('{"type":"get_state"}');
+				};
+	 
+				webSocket.onmessage = function(event) {
+					//alert('onmessage, ' + event.data);
+					var json = $.parseJSON(event.data);
+					if(json["type"] == "error") {
+						$('#log').prepend('<div class="packet error"><h2>' + json.details + '</h2></div>');
+					} else {
+						$('#log').prepend('<div class="packet data"><h1>' + json.type + '</h1><h2>' + printObject(json) + '</h2></div>');
+					}
+					//webSocket.close();
+				};
+	 
+				webSocket.onclose = function(event) {
+					//alert('onclose');
+					$('#log').prepend('<div class="packet closed"><h3>Connection closed</h3></div>');
+				};
+				
+				$('#packet_form').submit(function(){
+					webSocket.send($('#packet').val());
+					return false;
+				});
+			});
+        </script>
+		<style>
+		*{
+			padding: 0px;
+			margin: 0px;
+		}
+		body {
+			background: #000;
+			color: white;
+		}
+		.log {
+			margin: 20px;
+		}
+		.packet {
+			background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#333));
+			font-size: 85%;
+			margin: 5px;
+			border-radius: 3px;
+			whitespace: pre;
+			font-color: monospace;
+			text-shadow: rgba(255,255,255,0.8) 0 0 15px, #000 0 0 1px;
+		}
+		
+		.packet h1, .packet h2, .packet h3 {
+			padding: 5px;
+			display: inline-block;
+			font-weight: inherit;
+			font-size: inherit;
+			/* white-space: pre; */
+		}			
+		.packet h1 {
+			background: -webkit-gradient(linear, left top, left bottom, from(#1e90ff), to(#42aaff));
+			border-top-left-radius: 3px;
+			border-bottom-left-radius: 3px;
+			text-transform: uppercase;
+		}
+		.packet h2 {
+			color: #FFF;
+		}
+
+		.data {
+			background: -webkit-gradient(linear, left top, left bottom, from(#908718), to(#927807));
+		}
+		
+		.error {
+			background: -webkit-gradient(linear, left top, left bottom, from(#882828), to(#990707));
+		}
+		
+		.opened {
+			color: #0E0;
+		}
+		.closed {
+			color: red;
+		}
+		#form {
+			margin: 5px;
+			background: -webkit-gradient(linear, left top, left bottom, from(#555), to(#333));
+			padding: 10px;			
+		}
+		#packet {
+			display: inline-block;
+			padding: 3px;		
+			margin: 0 3px;
+			width: 600px;
+		}
+		#send {
+			display: inline-block;
+			padding: 3px;			
+			margin: 0 3px;
+		}
+		</style>
+    </head>
+    <body>
+	<div id="form"><form id="packet_form"><input type="text" id="packet"><button type="submit" id="send">Send</button></form></div>
+	<div id="log"></div>
+    </body>
+</html>

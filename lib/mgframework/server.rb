@@ -1,0 +1,1 @@
+require 'mgframework/server/server'
